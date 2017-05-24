@@ -1,2 +1,2 @@
 # myleetcode
-my leetcode excise
+my leetcode exercise
