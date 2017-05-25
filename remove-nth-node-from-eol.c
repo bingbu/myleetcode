@@ -160,5 +160,7 @@ int main(int argc, char *argv[]) {
 	list1 = removeNthFromEnd_one_pass(list, n);
 	printf("Remove done:\n");
 	display(list1);
+
+	return 0;
 }
 
