@@ -44,6 +44,29 @@ static bool find_dup(struct position *list) {
 
 	return false;
 }
+
+/*
+case 1:
+┌───┐
+│   │
+└───┼──>
+    │
+
+case 2:
+┌───┐
+│   │
+|   ^
+|   |
+|___|
+
+case 3:
+┌───┐
+│   │<---
+|   |   |
+|       |
+|_______|
+
+ */
 bool isSelfCrossing_best(int* x, int size)
 {
 	for(int i = 3; i < size; i++)
