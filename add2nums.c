@@ -40,7 +40,6 @@ struct ListNode* addTwoNumbers(const struct ListNode* l1, const struct ListNode*
 
 		l->val = sum % 10;
 		s = sum / 10;
-		printf("%d->", l->val);
 		if (l1 || l2) {
 			tmp = malloc(sizeof(struct ListNode));
 			if (tmp) {
@@ -57,7 +56,6 @@ struct ListNode* addTwoNumbers(const struct ListNode* l1, const struct ListNode*
 			tmp->next = NULL;
 			l->next = tmp;
 	}
-	printf("\n");
 
 	return head;
 }
@@ -70,7 +68,7 @@ struct ListNode *list_gen()
 	printf("Generating random lists...\n");
 
 	for (i = 0; i < 10; i++)
-		size = rand() % 30;
+		size = rand() % 50;
 
 	l = malloc(sizeof(struct ListNode));
 	head = l;
@@ -111,9 +109,11 @@ int main(int argc, char *argv[])
 	struct ListNode *l;
 	l = addTwoNumbers(list_gen(), list_gen());
 	
+	printf("Calculate output:\n");
 	while (l) {
-		printf("%d ", l->val);
+		printf("%d->", l->val);
 		l = l->next;
 	}
+	printf("\n");
 	return 0;
 }
