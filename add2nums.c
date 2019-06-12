@@ -21,7 +21,7 @@ struct ListNode* addTwoNumbers(const struct ListNode* l1, const struct ListNode*
 	sum = 0;
 	s = 0;
 	l = malloc(sizeof(struct ListNode));
-	if (!l) 
+	if (!l)
 		return NULL;
 	head = l;
 
@@ -53,9 +53,15 @@ struct ListNode* addTwoNumbers(const struct ListNode* l1, const struct ListNode*
 		tmp = malloc(sizeof(struct ListNode));
 		if (tmp)
 			tmp->val = s;
+			/*attention: the 'next' of last element must be set to
+			 * NULL, otherwise leetcode system will report error:
+			 * member access within misaligned address
+			 * 0xbebebebebebebebe for type 'struct ListNode'
+			 */
 			tmp->next = NULL;
 			l->next = tmp;
 	}
+	l->next = NULL;
 
 	return head;
 }
@@ -108,7 +114,7 @@ int main(int argc, char *argv[])
 {
 	struct ListNode *l;
 	l = addTwoNumbers(list_gen(), list_gen());
-	
+
 	printf("Calculate output:\n");
 	while (l) {
 		printf("%d->", l->val);
