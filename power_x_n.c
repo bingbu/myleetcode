@@ -17,7 +17,7 @@ double myPow(double x, int n)
 	 - n is odd number, x^n = (x^2) ^ (n/2) * x
 	 */
         for(i = n; i; i /= 2) {
-        	if (i & 0x1)
+		if (i & 0x1)
 			ret *= x;
 		x *= x;
         }
