@@ -1,2 +1,5 @@
-*.o
+*.pdb
+*.obj
+*.ilk
 *.exe
+.vscode/
