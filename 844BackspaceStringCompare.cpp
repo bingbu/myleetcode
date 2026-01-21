@@ -23,6 +23,7 @@ public:
                     slow--;
                 }
             }
+            //C++ STL容器的通用设计理念：容量只增不减（除非显式请求）
             str.resize(slow);
         };
 
