@@ -18,11 +18,25 @@ public:
             }
         }
     }
+
+    void moveZeroesII(vector<int>& nums) {
+        int slow = 0;
+		int n = nums.size();
+        for (int fast = 0; fast < n; ++fast) {
+            if (nums[fast] != 0) {
+				nums[slow] = nums[fast];
+                ++slow;
+            }
+        }
+        for (int i = slow; i < n; ++i) {
+            nums[i] = 0;
+        }
+    }
 };
 
 int main() {
     Solution sol;
-    
+
     vector<int> test1 = {0,1,0,3,12};
     sol.moveZeroes(test1);
     cout << "Test 1: ";
@@ -42,6 +56,13 @@ int main() {
     vector<int> test3 = {4,2,4,0,0,3,0,5,1,0};
     sol.moveZeroes(test3);
     cout << "Test 3: ";
+    for (int num : test3) {
+        cout << num << " ";
+    }
+    cout << endl;  // Expected: [4,2,4,3,5,1,0,0,0,0]
+
+    sol.moveZeroesII(test3);
+    cout << "Test 3 (II): ";
     for (int num : test3) {
         cout << num << " ";
     }
