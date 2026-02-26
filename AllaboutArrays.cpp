@@ -8,13 +8,19 @@
 349. Intersection of Two Arrays
 350. Intersection of Two Arrays II
 454. 4Sum II
+《编程之法》2.1 寻找最小的k个数
+《编程之法》2.1 三元组的数量
+《编程之法》2.2 寻找树中和为某值的路径
+53. Maximum Subarray
 */
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <set>
+#include <queue>
 #include <unordered_set>
 #include <unordered_map>
+
 using namespace std;
 class Solution {
 public:
@@ -84,6 +90,25 @@ public:
             map[nums[i]] = i;
         }
         return {};
+    }
+
+    vector<vector<int>> twoSumII(vector<int>& nums, int target) {
+        vector<vector<int>> res;
+        int n = nums.size() - 1;
+        int l = 0;
+        int r = n;
+        sort(nums.begin(), nums.end());
+
+        while (l < r) {
+            while((l < r) && nums[l] + nums[r] < target) l++;
+            while((l < r) && nums[l] + nums[r] > target) r--;
+            if (nums[l] + nums[r] == target) {
+                res.push_back({nums[l], nums[r]});
+                l++;
+                r--;
+            }
+        }
+        return res;
     }
 
     /*
@@ -245,6 +270,166 @@ public:
         }
         return count;
     }
+
+    /* 输入两个整数sum 和 n, 要求从数列1，2，3，4, ..., n中随意取若干个数，使得它们的和为sum，返回所有可能的组合
+     * 使用迭代法实现
+    */
+    vector<vector<int>> combinationSum(int sum, int n) {
+        if (sum == 0) return {{}};
+        // 递归退出条件：如果 n <= 0，说明没有合法组合，返回空数组
+        if (n <= 0) return {};
+        if (sum > n * (n + 1) / 2) return {};
+        vector<vector<int>> result;
+
+        // 不选 n：从 1~(n-1) 中凑 sum
+        for (auto& comb : combinationSum(sum, n - 1)) {
+            result.push_back(comb);
+        }
+        // 选 n：从 1~(n-1) 中凑 sum-n，再把 n 加上
+        for (auto comb : combinationSum(sum - n, n - 1)) {
+            comb.push_back(n);
+            result.push_back(comb);
+        }
+        return result;
+    }
+
+    /*
+    Given an array arr and an integer k, return the k smallest numbers in the array.
+    */
+   /*
+   First solution using insertion sort idea, time complexity O(n*k), space complexity O(k)
+   输出的结果是排序的，从大到小
+    */
+    vector<int> getLeastNumbers(vector<int>& arr, int k) {
+        int n = arr.size();
+        if (k <= 0) return {};
+        if (k > n) return arr;
+        vector<int> r(k);
+        int kmax = arr[0];
+        for (int i = 0; i < k; i++) {
+            r[i] = arr[i];
+            kmax = max(kmax, arr[i]);
+        }
+        // swapping to sort the first k elements in descending order, so that the largest of the k smallest is at r[0]
+        for (int i = 1; i < k; i++) {
+            int j = i;
+            while (j > 0 && r[j] > r[j - 1]) {
+                swap(r[j], r[j - 1]);
+                j--;
+            }
+        }
+
+        for (int i = k; i < n; i++) {
+            if (arr[i] < kmax) {
+                r[0] = arr[i];
+                // swap down to maintain descending order
+                int j = 0;
+                while (j < k - 1 && r[j] < r[j + 1]) {
+                    swap(r[j], r[j + 1]);
+                    j++;
+                }
+            }
+        }
+        return r;
+    }
+
+    /*
+    optimal solution using a max heap of size k
+    输出的结果也是排序的，时间复杂度 O(n log k)，空间复杂度 O(k)
+     */
+    vector<int> getLeastNumbers_heap(vector<int>& arr, int k) {
+        if (k <= 0) return {};
+        if (k >= arr.size()) return arr;
+        priority_queue<int> maxHeap; // 大顶堆
+        for (int num : arr) {
+            if (maxHeap.size() < k) {
+                maxHeap.push(num);
+            } else if (num < maxHeap.top()) {
+                maxHeap.pop();
+                maxHeap.push(num);
+            }
+        }
+        vector<int> r;
+        while (!maxHeap.empty()) {
+            r.push_back(maxHeap.top());
+            maxHeap.pop();
+        }
+        return r;
+    }
+    /*
+    quick select solution, time complexity O(n) on average, space complexity O(1)
+    输出的结果是排序的，从小到大
+    */
+    vector<int> getLeastNumbers_quickSelect(vector<int>& arr, int k) {
+        if (k <= 0) return {};
+        if (k >= arr.size()) return arr;
+        nth_element(arr.begin(), arr.begin() + k, arr.end());
+        return vector<int>(arr.begin(), arr.begin() + k);
+    }
+
+    /* 给定一个数列和m个三元组表示的查询，对于每个查询(i, j, k), 输出数列第i个到第j个的升序排列中的第k个元素 */
+    vector<int> queryKthSmallest(vector<int>& arr, vector<vector<int>>& queries) {
+        vector<int> result;
+        for (const auto& q : queries) {
+            int i = q[0], j = q[1], k = q[2];
+            vector<int> sub(arr.begin() + i, arr.begin() + j + 1);
+            nth_element(sub.begin(), sub.begin() + k - 1, sub.end());
+            result.push_back(sub[k - 1]);
+        }
+        return result;
+    }
+
+    int partition(vector<int>& arr, int left, int right) {
+        int pivot = arr[left];
+        int i = left + 1;
+        for (int j = left + 1; j <= right; j++) {
+            if (arr[j] > pivot) {
+                swap(arr[j], arr[i]);
+                i++;
+            }
+        }
+        swap(arr[left], arr[i - 1]);
+        return i - 1;
+    }
+
+    void quickSelect(vector<int>& arr, int left, int right, int k) {
+        if (left >= right) return;
+        int pivot = partition(arr, left, right);
+        if (pivot == k) {
+            return;
+        } else if (pivot < k) {
+            quickSelect(arr, pivot + 1, right, k);
+        } else {
+            quickSelect(arr, left, pivot - 1, k);
+        }
+    }
+
+    vector<int> getLargestNumbers_quickSelect(vector<int>& arr, int k) {
+        if (k <= 0) return {};
+        if (k >= arr.size()) return arr;
+        nth_element(arr.begin(), arr.begin() + k, arr.end(), greater<int>());
+        return vector<int>(arr.begin(), arr.begin() + k);
+    }
+
+    vector<int> getLargestNumbers_quickSelectII(vector<int>& arr, int k) {
+        if (k <= 0) return {};
+        if (k >= arr.size()) return arr;
+        quickSelect(arr, 0, arr.size() - 1, k);
+        return vector<int>(arr.begin(), arr.begin() + k);
+    }
+
+    int maxSubArray(vector<int>& nums) {
+        int n = nums.size();
+        int result = nums[0];
+        int sum = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (sum < 0) sum = nums[i];
+            else sum += nums[i];
+            result = max(result, sum);
+        }
+        return result;
+    }
 };
 
 int main() {
@@ -288,12 +473,23 @@ int main() {
         cout << num << " ";
     }
     cout << endl;
-    vector<int> nums7 = {2, 7, 11, 15};
+    vector<int> nums7 = {2, 3, 7, 8, 11, 15, 6, 1, 4, 5, 9, 0};
     int target = 9;
     vector<int> result7 = sol.twoSum(nums7, target);
     cout << "Two Sum indices: " << endl;
     for (int num : result7) {
         cout << num << " ";
+    }
+    cout << endl;
+
+    vector<vector<int>> res = sol.twoSumII(nums7, target);
+    cout << "Two Sum II indices: " << endl;
+    for (const auto& pair : res) {
+        cout << "[ ";
+        for (int num : pair) {
+            cout << num << " ";
+        }
+        cout << "],";
     }
     cout << endl;
 
@@ -329,6 +525,59 @@ int main() {
     vector<int> nums13 = {0, 2};
     int count = sol.fourSumCount(nums10, nums11, nums12, nums13, 2);
     cout << "fourSumCount: " << count << endl;
+
+    vector<int> arr = {1, 3, 2, 5, 5, 4};
+    int k = 3;
+    vector<int> leastNumbers = sol.getLeastNumbers(arr, k);
+    cout << "Least " << k << " numbers: " << endl;
+    for (int num : leastNumbers) {
+        cout << num << " ";
+    }
+    cout << endl;
+
+    vector<int> leastNumbers2 = sol.getLeastNumbers_heap(arr, k);
+    cout << "Least " << k << " numbers using heap: " << endl;
+    for (int num : leastNumbers2) {
+        cout << num << " ";
+    }
+
+    cout << endl;
+    vector<int> leastNumbers3 = sol.getLeastNumbers_quickSelect(arr, k);
+    cout << "Least " << k << " numbers using quick select: " << endl;
+    for (int num : leastNumbers3) {
+        cout << num << " ";
+    }
+    cout << endl;
+    vector<int> arr2 = {9, 1, 3, 2, 7, 8, 5, 5, 4};
+    vector<int> largestNumbers = sol.getLargestNumbers_quickSelectII(arr2, 2);
+    cout << "Largest 2 numbers using quick select II: " << endl;
+    for (int num : largestNumbers) {
+        cout << num << " ";
+    }
+    cout << endl;
+
+    vector<int> arr3 = {3, 1, 2, 5, 4};
+    vector<vector<int>> queries = {{0, 4, 3}, {1, 3, 2}, {0, 2, 1}};
+    vector<int> queryResults = sol.queryKthSmallest(arr3, queries);
+    cout << "Query Kth Smallest results: " << endl;
+    for (int num : queryResults) {
+        cout << num << " ";
+    }
+    cout << endl;
+
+    // Test combinationSum: 从 1~n 中选若干数使和为 sum
+    vector<vector<int>> combResults = sol.combinationSum(10, 5);
+    cout << "combinationSum(10, 5): " << endl;
+    for (const auto& comb : combResults) {
+        cout << "[ ";
+        for (int num : comb) {
+            cout << num << " ";
+        }
+        cout << "]" << endl;
+    }
+    vector<int> nums15 = {3, 1, -2, 3, 10, -4, 7, 2, -5};
+    int maxSum = sol.maxSubArray(nums15);
+    cout << "Maximum Subarray Sum: " << maxSum << endl;
 
     return 0;
 }
