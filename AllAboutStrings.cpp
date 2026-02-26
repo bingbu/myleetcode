@@ -715,6 +715,46 @@ public:
         return s; // entire string is nice
     }
 
+    int longestCommonSubsequence(string text1, string text2) {
+        int m = text1.size();
+        int n = text2.size();
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (text1[i - 1] == text2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+    /*
+    空间优化版：O(min(m,n)) 空间，一维滚动数组 + prev 变量保存左上角
+    让较短字符串做内层循环，进一步节省空间
+    */
+    int longestCommonSubsequenceII(string text1, string text2) {
+        if (text1.size() < text2.size()) swap(text1, text2);
+        int m = text1.size();
+        int n = text2.size();
+        vector<int> dp(n + 1, 0);
+        for (int i = 1; i <= m; i++) {
+            int prev = 0; // 等价于 dp[i-1][j-1]
+            for (int j = 1; j <= n; j++) {
+                int temp = dp[j]; // 保存 dp[i-1][j]，下轮变成 prev
+                if (text1[i - 1] == text2[j - 1]) {
+                    dp[j] = prev + 1;
+                } else {
+                    dp[j] = max(dp[j], dp[j - 1]); // max(上方, 左方)
+                }
+                prev = temp;
+            }
+        }
+        return dp[n];
+    }
+
 private:
     void backtrack(string& s, int start, vector<string>& path, vector<vector<string>>& result) {
         if (start == s.size()) {
@@ -909,6 +949,10 @@ int main() {
 
     string s31 ="YazaAay";
     cout << "Longest nice substring: " << sol.longestNiceSubstring(s31) << endl;
+
+    string text1 = "AGGTAB";
+    string text2 = "GXTXAYB";
+    cout << "Longest common subsequence length: " << sol.longestCommonSubsequence(text1, text2) << endl;
 
     return 0;
 }
