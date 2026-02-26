@@ -6,12 +6,12 @@ using namespace std;
 class Solution {
 public:
     string longestCommonPrefix(vector<string>& strs) {
-        if (strs.empty()) 
+        if (strs.empty())
             return "";
 
-        if (strs.size() == 1) 
+        if (strs.size() == 1)
             return strs[0];
-        
+
         int min_length = strs[0].size();
         for (int i = 1; i < strs.size(); ++i) {
             if (strs[i].size() < min_length) {
